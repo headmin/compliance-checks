@@ -1,8 +1,6 @@
-
 {
   "name": "macOS ComplianceChecks",
   "platform": "darwin",
-  "compliance_check" = yes
   "queries": {
 	"SIP enabled": {
 		"query" : "SELECT 1, CASE count(*) WHEN 0 THEN 'FAILED' ELSE 'OK' END ztl_status FROM sip_config WHERE config_flag = 'sip' AND enabled = 1;",
