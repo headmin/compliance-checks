@@ -24,12 +24,14 @@
 		"description" : "(https://osquery.io/schema/5.4.0/#system_extensions)",
 		"value" : "check system_extensions, report compliance status"
 	  },
-      "psssword policy": {
+      "password policy": {
 		"query" : "SELECT 1, CASE count(*) WHEN 0 THEN 'FAILED' ELSE 'OK' END ztl_status FROM (SELECT cast(lengthtxt AS integer(2)) minlength FROM (SELECT SUBSTRING(LENGTH, 1, 2) AS lengthtxt FROM (SELECT policy_description, policy_identifier, split(policy_content, '{', 1) AS LENGTH FROM password_policy WHERE policy_identifier LIKE '%minLength')) WHERE minlength >= 12);",
 		"interval" : "3600",
 		"version": "5.0.0",
 		"description" : "(https://osquery.io/schema/5.4.0/#password_policy)",
-		"value" : "check password_policy, report compliance status"
+		"value" : "check password_policy, report compliance status",
+	        "complianceCheck" : true
+	      
 	  }
   }
 }
