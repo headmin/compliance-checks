@@ -2,5 +2,34 @@
 {
   "name": "macOS ComplianceChecks",
   "platform": "darwin",
-  "queries": {}
+  "queries": {
+	"SIP enabled": {
+		"query" : "SELECT 1, CASE count(*) WHEN 0 THEN 'FAILED' ELSE 'OK' END ztl_status FROM sip_config WHERE config_flag = 'sip' AND enabled = 1;",
+		"interval" : "3600",
+		"version": "5.0.0",
+		"description" : "(https://osquery.io/schema/5.4.0/#sip_config)",
+		"value" : "check sip_config, report compliance status"
+	  },
+	"SecureToken present": {
+		"query" : "SELECT path, value, CASE count(*) WHEN 0 THEN 'FAILED' ELSE 'OK' END ztl_status FROM plist WHERE path like '/var/db/dslocal/nodes/Default/users/%.plist' AND KEY = 'authentication_authority' AND value = ';SecureToken;';",
+		"interval" : "3600",
+		"version": "5.0.0",
+		"description" : "(https://osquery.io/schema/5.4.0/#plist)",
+		"value" : "check plist for secure token users, report compliance status"
+	  },
+      "Santa sysex activated & enabled": {
+		"query" : "WITH expected_sysexts(team, identifier) AS (VALUES ('EQHXZ8M8AV', 'com.google.santa.daemon')) SELECT expected_sysexts.*, system_extensions.version, CASE WHEN system_extensions.uuid IS NOT NULL THEN 'OK' ELSE 'FAILED' END ztl_status FROM expected_sysexts LEFT JOIN system_extensions ON (system_extensions.team = expected_sysexts.team AND system_extensions.identifier = expected_sysexts.identifier AND system_extensions.state = 'activated_enabled');",
+		"interval" : "3600",
+		"version": "5.4.0",
+		"description" : "(https://osquery.io/schema/5.4.0/#system_extensions)",
+		"value" : "check system_extensions, report compliance status"
+	  },
+      "psssword policy": {
+		"query" : "SELECT 1, CASE count(*) WHEN 0 THEN 'FAILED' ELSE 'OK' END ztl_status FROM (SELECT cast(lengthtxt AS integer(2)) minlength FROM (SELECT SUBSTRING(LENGTH, 1, 2) AS lengthtxt FROM (SELECT policy_description, policy_identifier, split(policy_content, '{', 1) AS LENGTH FROM password_policy WHERE policy_identifier LIKE '%minLength')) WHERE minlength >= 12);",
+		"interval" : "3600",
+		"version": "5.0.0",
+		"description" : "(https://osquery.io/schema/5.4.0/#password_policy)",
+		"value" : "check password_policy, report compliance status"
+	  }
+  }
 }
